@@ -1,0 +1,8 @@
+impl/
+simulation/
+*.log
+*.tmp
+*.jed
+*.bin
+*.fsd
+*.rpt
