@@ -14,7 +14,8 @@ entity top is
             CS32 : in STD_LOGIC;
             CS8 : in STD_LOGIC;
             MOSI : in STD_LOGIC;
-            MSCLK : in STD_LOGIC -- MSCLK from uC side
+            MSCLK : in STD_LOGIC; -- MSCLK from uC side
+            Square_Wave_IO_Toggle_PIN : out STD_LOGIC
          );
 end top;
 
@@ -29,7 +30,7 @@ architecture Behavioral of top is
     signal Q : STD_LOGIC_VECTOR (7 downto 0) := (others => '0');
     signal slow_clk : STD_LOGIC := '0';
     signal clk_div : unsigned (23 downto 0) := (others => '0');
-    signal enableV : STD_LOGiC := '1';
+    signal enableV : STD_LOGIC := '1';
     signal resetV : STD_LOGIC := '0';
     signal aresetV : STD_LOGIC := '0';
     signal LED_flag : STD_LOGIC := '0';
@@ -39,26 +40,46 @@ architecture Behavioral of top is
     -- Signals necessary for Input demultiplexer
     signal Output32SPIIN : STD_LOGIC := '0';
     signal Output8SPIIN : STD_LOGIC := '0';
-    signal Input_SPI : STD_LOGIC := '0';
     --
 
     -- Signals responsible for bit shift registers
     signal Q8BS : STD_LOGIC_VECTOR (7 downto 0) := (others => '0');
-    signal Q32BS : STD_LOGIC_VECTOR (32 downto 0) := (others => '0');
+    signal Q32BS : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
     signal Reset_All : STD_LOGIC := '0';
+    --
+
+    -- Signals needed for 32 bit ROM counter
+    signal Enable_stepcounter : STD_LOGIC := '0';
+    signal Incrementing_Step : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
+    signal Output32_Rom_Counter : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
+
+    -- Signals needed for 32 bit Comparator counter for square wave generation
+    signal clock_300MHZ : STD_LOGIC;
+    signal Output_Comparator_Counter : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
+    --
+
+    -- Signal that is needed for demultiplexer that routes 32 BSR output
+    signal Comparator_Storage : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
+    --
+
+    -- Signal for initialization of Square_Wave_IO_Toggle_PIN
+    Square_Wave_S : STD_LOGIC := '0';
+    --
+    
+    -- 
     --------------------------------------------
 begin
 
     -- Demultiplexer for SPI input
-    Output32SPIIN <= Input_SPI when (CS32 = '0' and CS8 = '1') else '0';
-    Output8SPIIN <= Input_SPI when (CS8 = '0' and CS32 = '1') else '0';
+    Output32SPIIN <= MOSI when (CS32 = '0' and CS8 = '1') else '0';
+    Output8SPIIN <= MOSI when (CS8 = '0' and CS32 = '1') else '0';
     --
 
     -- instantiating 8 bit shift register
     bit_shift_register_8 : entity work.LSB_8bit_Shift_Register
     port map
     (
-        D => Output8,
+        D => Output8SPIIN,
         Q => Q8BS,
         CLK => MSCLK,
         RESET => Reset_All,
@@ -70,20 +91,60 @@ begin
     bit_shift_register_32 : entity work.LSB_32bit_Shift_Register
     port map
     (
-        D => Output32,
+        D => Output32SPIIN,
         Q => Q32BS,
         CLK => MSCLK,
         RESET => Reset_All,
-        Enable => not CS32
+        ENABLE => not CS32
     );
     --
 
-    -- 
 
 
+    -- instantiating 32 bit counter for ROM verting
+    ROM_Counter32 : entity work.counter_32bit
+    port map
+    (
+        CLK => clock_594MHZ,
+        ENABLE => Enable_stepcounter,
+        RESET => '0',
+        D => Incrementing_Step,
+        Q => Output32_Rom_Counter,
+        ARESET => Reset_All
+    );
+    --
 
+    -- instantiating 32bit comparator counter
+    Comparator_Counter32 : entity work.counter_32bit
+    port map
+    (
+        CLK => clock_300MHZ,
+        ENABLE => Q8BS(0),
+        RESET => '0',
+        D => x"00000001",
+        Q => Output_Comparator_Counter,
+        ARESET => Reset_All
+    );
 
+    -- performing logic for enabling of rom counter and direction of 32BS Register output
+    Enable_stepcounter <= '1' when (CS32 = '1' and CS8 = '1' and Q8BS(0) = '0') else '0';
 
+    Incrementing_Step <= Q32BS when Q8BS(0) = '0' else (others => '0');
+    Comparator_Storage <= Q32BS when Q8BS(0) = '1' else (others => '0');
+    --
+
+    -- Comparator Logic
+    process (clock_300MHZ)
+    begin
+    if rising_edge (clock_300MHZ) then
+    if Output_Comparator_Counter = Comparator_Storage then
+        Square_Wave_S <= not Square_Wave_S;
+    end if;
+    end if;
+    end process;
+
+    Square_Wave_IO_Toggle_PIN <= Square_Wave_S;
+    --
 
 
 
