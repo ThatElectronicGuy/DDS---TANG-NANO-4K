@@ -79,6 +79,8 @@ architecture Behavioral of top is
     signal Reverse_Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
     signal Sine_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Sine_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
+
+    signal Address6 : STD_LOGIC_VECTOR (5 downto 0) := (others => '0');
     --
 
     -- 
@@ -196,9 +198,16 @@ begin
         DATA => Sine_Wave_DAC_Drive
     );
 
+    -- filling signal that will hold 6 adddress bits from step incrementing counter
+    Address6 <= Output32_Rom_Counter (31 downto 26);
+    --
 
-
-
+    -- Demultiplexer that routes addresses for the right wave form ROM
+    Triangle_Wave_Address <= Address6 when (Q8BS(7) = '0' and Q8BS(6) = '0' and Q8BS(5) = '1') else (others => '0');
+    Sawtooth_Wave_Address <= Address6 when (Q8BS(7) = '0' and Q8BS(6) = '1' and Q8BS(5) = '0') else (others => '0');
+    Reverse_Sawtooth_Wave_Address <= Address6 when (Q8BS(7) = '1' and Q8BS(6) = '0' and Q8BS(5) = '0') else (others => '0');
+    Sine_Wave_Address <= Address6 when (Q8BS(7) = '0' and Q8BS(6) = '1' and Q8BS(5) = '1') else (others => '0');
+    --
 
 
 
