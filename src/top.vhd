@@ -72,13 +72,13 @@ architecture Behavioral of top is
     
     -- Signals used in all ROMS
     signal Triangle_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
-    signal Triangle_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    signal Triangle_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
     signal Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
-    signal Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    signal Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
     signal Reverse_Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
-    signal Reverse_Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    signal Reverse_Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
     signal Sine_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
-    signal Sine_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    signal Sine_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
     --
 
     -- 
