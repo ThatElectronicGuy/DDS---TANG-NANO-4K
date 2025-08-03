@@ -5,6 +5,10 @@ use work.counter_8bit;
 use work.counter_32bit;
 use work.LSB_8bit_Shift_Register;
 use work.LSB_32bit_Shift_Register;
+use work.Triangle_Wave_ROM;
+use work.Sawtooth_Wave_ROM;
+use work.Reverse_Sawtooth_Wave_ROM;
+use work.Sine_Wave_ROM;
 
 entity top is
     Port (
@@ -63,9 +67,20 @@ architecture Behavioral of top is
     --
 
     -- Signal for initialization of Square_Wave_IO_Toggle_PIN
-    Square_Wave_S : STD_LOGIC := '0';
+    signal Square_Wave_S : STD_LOGIC := '0';
     --
     
+    -- Signals used in all ROMS
+    signal Triangle_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
+    signal Triangle_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    signal Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
+    signal Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    signal Reverse_Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
+    signal Reverse_Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    signal Sine_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
+    signal Sine_Wave_DAC_Drive : STD_LOGIC_VECTOR (13 downto 0);
+    --
+
     -- 
     --------------------------------------------
 begin
@@ -146,6 +161,40 @@ begin
     Square_Wave_IO_Toggle_PIN <= Square_Wave_S;
     --
 
+    -- Instantiating Triangle Wave ROM
+    Triangle_Wave : entity work.Triangle_Wave_ROM
+    port map 
+    (
+        ADDR => Triangle_Wave_Address,
+        DATA => Triangle_Wave_DAC_Drive
+    );
+    --
+
+    -- Instantiating Sawtooth Wave ROM
+    Sawtooth_Wave : entity work.Sawtooth_Wave_ROM
+    port map
+    (
+        ADDR => Sawtooth_Wave_Address,
+        DATA => Sawtooth_Wave_DAC_Drive
+    );
+    --
+
+    -- Instantiating Reverse Sawtooth ROM
+    Reverse_Sawtooth : entity work.Reverse_Sawtooth_Wave_ROM
+    port map
+    (
+        ADDR => Reverse_Sawtooth_Wave_Address,
+        DATA => Reverse_Sawtooth_Wave_DAC_Drive
+    );
+    --
+
+    -- Instantiating Sine ROM
+    Sine : entity work.Sine_Wave_ROM
+    port map
+    (
+        ADDR => Sine_Wave_Address,
+        DATA => Sine_Wave_DAC_Drive
+    );
 
 
 
