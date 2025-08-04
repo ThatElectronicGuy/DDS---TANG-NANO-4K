@@ -3,8 +3,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use work.counter_8bit;
 use work.counter_32bit;
-use work.LSB_8bit_Shift_Register;
-use work.LSB_32bit_Shift_Register;
+use work.LSB_bit_shift_register_4bit;
+use work.LSB_bit_shift_register_32bit;
 use work.Triangle_Wave_ROM;
 use work.Sawtooth_Wave_ROM;
 use work.Reverse_Sawtooth_Wave_ROM;
@@ -16,10 +16,11 @@ entity top is
             CLK_594MHZ : out STD_LOGIC;
             LED : out STD_LOGIC;
             CS32 : in STD_LOGIC;
-            CS8 : in STD_LOGIC;
+            CS4 : in STD_LOGIC;
             MOSI : in STD_LOGIC;
             MSCLK : in STD_LOGIC; -- MSCLK from uC side
-            Square_Wave_IO_Toggle_PIN : out STD_LOGIC
+            Square_Wave_IO_Toggle_PIN : out STD_LOGIC;
+            DAC_Output : out STD_LOGIC_VECTOR (15 downto 0)
          );
 end top;
 
@@ -40,14 +41,15 @@ architecture Behavioral of top is
     signal LED_flag : STD_LOGIC := '0';
     --
 
+----------------------------------------------------------------------------------
 
     -- Signals necessary for Input demultiplexer
     signal Output32SPIIN : STD_LOGIC := '0';
-    signal Output8SPIIN : STD_LOGIC := '0';
+    signal Output4SPIIN : STD_LOGIC := '0';
     --
 
     -- Signals responsible for bit shift registers
-    signal Q8BS : STD_LOGIC_VECTOR (7 downto 0) := (others => '0');
+    signal Q4BS : STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
     signal Q32BS : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
     signal Reset_All : STD_LOGIC := '0';
     --
@@ -83,29 +85,31 @@ architecture Behavioral of top is
     signal Address6 : STD_LOGIC_VECTOR (5 downto 0) := (others => '0');
     --
 
-    -- 
+    -- Output to DAC
+    signal To_DAC : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
+    --
     --------------------------------------------
 begin
 
     -- Demultiplexer for SPI input
-    Output32SPIIN <= MOSI when (CS32 = '0' and CS8 = '1') else '0';
-    Output8SPIIN <= MOSI when (CS8 = '0' and CS32 = '1') else '0';
+    Output32SPIIN <= MOSI when (CS32 = '0' and CS4 = '1') else '0';
+    Output4SPIIN <= MOSI when (CS4 = '0' and CS32 = '1') else '0';
     --
 
-    -- instantiating 8 bit shift register
-    bit_shift_register_8 : entity work.LSB_8bit_Shift_Register
+    -- instantiating 4 bit shift register
+    bit_shift_register_4 : entity work.LSB_bit_shift_register_4bit
     port map
     (
-        D => Output8SPIIN,
-        Q => Q8BS,
+        D => Output4SPIIN,
+        Q => Q4BS,
         CLK => MSCLK,
         RESET => Reset_All,
-        ENABLE => not CS8
+        ENABLE => not CS4
     );
     --
 
     -- instatiating 32 bit shift register
-    bit_shift_register_32 : entity work.LSB_32bit_Shift_Register
+    bit_shift_register_32 : entity work.LSB_bit_shift_register_32bit
     port map
     (
         D => Output32SPIIN,
@@ -136,7 +140,7 @@ begin
     port map
     (
         CLK => clock_300MHZ,
-        ENABLE => Q8BS(0),
+        ENABLE => Q4BS(0),
         RESET => '0',
         D => x"00000001",
         Q => Output_Comparator_Counter,
@@ -144,10 +148,10 @@ begin
     );
 
     -- performing logic for enabling of rom counter and direction of 32BS Register output
-    Enable_stepcounter <= '1' when (CS32 = '1' and CS8 = '1' and Q8BS(0) = '0') else '0';
+    Enable_stepcounter <= '1' when (CS32 = '1' and CS4 = '1' and Q4BS(0) = '0') else '0';
 
-    Incrementing_Step <= Q32BS when Q8BS(0) = '0' else (others => '0');
-    Comparator_Storage <= Q32BS when Q8BS(0) = '1' else (others => '0');
+    Incrementing_Step <= Q32BS when Q4BS(0) = '0' else (others => '0');
+    Comparator_Storage <= Q32BS when Q4BS(0) = '1' else (others => '0');
     --
 
     -- Comparator Logic
@@ -203,13 +207,28 @@ begin
     --
 
     -- Demultiplexer that routes addresses for the right wave form ROM
-    Triangle_Wave_Address <= Address6 when (Q8BS(7) = '0' and Q8BS(6) = '0' and Q8BS(5) = '1') else (others => '0');
-    Sawtooth_Wave_Address <= Address6 when (Q8BS(7) = '0' and Q8BS(6) = '1' and Q8BS(5) = '0') else (others => '0');
-    Reverse_Sawtooth_Wave_Address <= Address6 when (Q8BS(7) = '1' and Q8BS(6) = '0' and Q8BS(5) = '0') else (others => '0');
-    Sine_Wave_Address <= Address6 when (Q8BS(7) = '0' and Q8BS(6) = '1' and Q8BS(5) = '1') else (others => '0');
+    Triangle_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '0' and Q4BS(1) = '1') else (others => '0');
+    Sawtooth_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '1' and Q4BS(1) = '0') else (others => '0');
+    Reverse_Sawtooth_Wave_Address <= Address6 when (Q4BS(3) = '1' and Q4BS(2) = '0' and Q4BS(1) = '0') else (others => '0');
+    Sine_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '1' and Q4BS(1) = '1') else (others => '0');
     --
 
+    -- Multiplexer that routes the right ROM to the DAC
+    with Q4BS(3 downto 1) select
+        To_DAC <= Triangle_Wave_DAC_Drive when "001",
+                  Sawtooth_Wave_DAC_Drive when "010",
+                  Reverse_Sawtooth_Wave_DAC_Drive when "100",
+                  Sine_Wave_DAC_Drive when "011",
+                  (others => '0') when others;
+    --
 
+    -- Mapping signal to physical port
+    DAC_Output <= To_DAC;
+    --
+
+    -- Assigning Reset_All function for "111"
+    Reset_All <= '1' when (Q4BS(3) = '1' and Q4BS(2) = '1' and Q4BS(1) = '1') else '0';
+    --
 
 
 

@@ -16,7 +16,7 @@ end LSB_bit_shift_register_32bit;
 architecture Behavioral of LSB_bit_shift_register_32bit is   
     signal Q_s : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
 begin
-    process (CLK)
+    process (all)
     begin
         if RESET = '1' then
         Q_s <= (others => '0');
