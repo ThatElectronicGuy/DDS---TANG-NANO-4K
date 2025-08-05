@@ -14,6 +14,7 @@ entity top is
     Port (
             CLK_27MHZ : in STD_LOGIC;
             CLK_594MHZ : out STD_LOGIC;
+            CLK_100MHZ : out STD_LOGIC;
             LED : out STD_LOGIC;
             CS32 : in STD_LOGIC;
             CS4 : in STD_LOGIC;
@@ -39,9 +40,10 @@ architecture Behavioral of top is
     signal resetV : STD_LOGIC := '0';
     signal aresetV : STD_LOGIC := '0';
     signal LED_flag : STD_LOGIC := '0';
+    signal DEBUG_s : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
     --
 
-----------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     -- Signals necessary for Input demultiplexer
     signal Output32SPIIN : STD_LOGIC := '0';
@@ -73,14 +75,19 @@ architecture Behavioral of top is
     --
     
     -- Signals used in all ROMS
+    attribute keep : boolean;
     signal Triangle_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Triangle_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
+    attribute keep of Triangle_Wave_DAC_Drive : signal is true;
     signal Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
+    attribute keep of Sawtooth_Wave_DAC_Drive : signal is true;
     signal Reverse_Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Reverse_Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
+    attribute keep of Reverse_Sawtooth_Wave_DAC_Drive : signal is true;
     signal Sine_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Sine_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
+    attribute keep of Sine_Wave_DAC_Drive : signal is true;
 
     signal Address6 : STD_LOGIC_VECTOR (5 downto 0) := (others => '0');
     --
@@ -88,7 +95,14 @@ architecture Behavioral of top is
     -- Output to DAC
     signal To_DAC : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
     --
-    --------------------------------------------
+
+    -- Seprate Clock needed becaused of DAC limitation 125MSPS
+    signal clock_100MHZ : STD_LOGIC;
+    --
+
+
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 begin
 
     -- Demultiplexer for SPI input
@@ -139,7 +153,7 @@ begin
     Comparator_Counter32 : entity work.counter_32bit
     port map
     (
-        CLK => clock_300MHZ,
+        CLK => CLK_27MHZ,
         ENABLE => Q4BS(0),
         RESET => '0',
         D => x"00000001",
@@ -207,10 +221,14 @@ begin
     --
 
     -- Demultiplexer that routes addresses for the right wave form ROM
-    Triangle_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '0' and Q4BS(1) = '1') else (others => '0');
-    Sawtooth_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '1' and Q4BS(1) = '0') else (others => '0');
-    Reverse_Sawtooth_Wave_Address <= Address6 when (Q4BS(3) = '1' and Q4BS(2) = '0' and Q4BS(1) = '0') else (others => '0');
-    Sine_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '1' and Q4BS(1) = '1') else (others => '0');
+--    Triangle_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '0' and Q4BS(1) = '1') else (others => '0');
+--    Sawtooth_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '1' and Q4BS(1) = '0') else (others => '0');
+--    Reverse_Sawtooth_Wave_Address <= Address6 when (Q4BS(3) = '1' and Q4BS(2) = '0' and Q4BS(1) = '0') else (others => '0');
+--    Sine_Wave_Address <= Address6 when (Q4BS(3) = '0' and Q4BS(2) = '1' and Q4BS(1) = '1') else (others => '0');
+    Triangle_Wave_Address <= Address6;
+    Sawtooth_Wave_Address <= Address6;
+    Reverse_Sawtooth_Wave_Address <= Address6;
+    Sine_Wave_Address <= Address6;
     --
 
     -- Multiplexer that routes the right ROM to the DAC
@@ -230,8 +248,13 @@ begin
     Reset_All <= '1' when (Q4BS(3) = '1' and Q4BS(2) = '1' and Q4BS(1) = '1') else '0';
     --
 
+    --
+    CLK_100MHZ <= clock_100MHZ;
+    --
 
-
+    -- Tying roms output to something uselless so that synthesis tool does not sweep them out in optimizing
+    DEBUG_s <= Triangle_Wave_DAC_Drive or Sawtooth_Wave_DAC_Drive or Reverse_Sawtooth_Wave_DAC_Drive or Sine_Wave_DAC_Drive;
+    --
 
 
 
