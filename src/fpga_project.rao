@@ -2,31 +2,59 @@
 <GAO_CONFIG>
     <Version>3.0</Version>
     <Mode>Standard</Mode>
-    <AoCore index="0" sample_clock="debug_out" trig_type="0" storage_depth="1024" window_num="1" capture_amount="1024" implementation="0" trigger_pos="0" module_name="top" force_trigger_by_falling_edge="false" capture_init_data_enabled="false">
+    <AoCore index="0" sample_clock="CLK_27MHZ" trig_type="0" storage_depth="1024" window_num="1" capture_amount="1024" implementation="0" trigger_pos="0" module_name="top" force_trigger_by_falling_edge="false" capture_init_data_enabled="false">
         <SignalList>
-            <Signal capture_enable="true">debug_PLL_594MHZ</Signal>
+            <Signal capture_enable="true">LED</Signal>
+            <Bus capture_enable="true" name="Comparator_Counter32/count[31:0]">
+                <Signal>Comparator_Counter32/count[31]</Signal>
+                <Signal>Comparator_Counter32/count[30]</Signal>
+                <Signal>Comparator_Counter32/count[29]</Signal>
+                <Signal>Comparator_Counter32/count[28]</Signal>
+                <Signal>Comparator_Counter32/count[27]</Signal>
+                <Signal>Comparator_Counter32/count[26]</Signal>
+                <Signal>Comparator_Counter32/count[25]</Signal>
+                <Signal>Comparator_Counter32/count[24]</Signal>
+                <Signal>Comparator_Counter32/count[23]</Signal>
+                <Signal>Comparator_Counter32/count[22]</Signal>
+                <Signal>Comparator_Counter32/count[21]</Signal>
+                <Signal>Comparator_Counter32/count[20]</Signal>
+                <Signal>Comparator_Counter32/count[19]</Signal>
+                <Signal>Comparator_Counter32/count[18]</Signal>
+                <Signal>Comparator_Counter32/count[17]</Signal>
+                <Signal>Comparator_Counter32/count[16]</Signal>
+                <Signal>Comparator_Counter32/count[15]</Signal>
+                <Signal>Comparator_Counter32/count[14]</Signal>
+                <Signal>Comparator_Counter32/count[13]</Signal>
+                <Signal>Comparator_Counter32/count[12]</Signal>
+                <Signal>Comparator_Counter32/count[11]</Signal>
+                <Signal>Comparator_Counter32/count[10]</Signal>
+                <Signal>Comparator_Counter32/count[9]</Signal>
+                <Signal>Comparator_Counter32/count[8]</Signal>
+                <Signal>Comparator_Counter32/count[7]</Signal>
+                <Signal>Comparator_Counter32/count[6]</Signal>
+                <Signal>Comparator_Counter32/count[5]</Signal>
+                <Signal>Comparator_Counter32/count[4]</Signal>
+                <Signal>Comparator_Counter32/count[3]</Signal>
+                <Signal>Comparator_Counter32/count[2]</Signal>
+                <Signal>Comparator_Counter32/count[1]</Signal>
+                <Signal>Comparator_Counter32/count[0]</Signal>
+            </Bus>
+            <Bus capture_enable="true" name="Q4BS[3:0]">
+                <Signal>Q4BS[3]</Signal>
+                <Signal>Q4BS[2]</Signal>
+                <Signal>Q4BS[1]</Signal>
+                <Signal>Q4BS[0]</Signal>
+            </Bus>
         </SignalList>
         <Triggers>
             <Trigger index="0">
                 <SignalList>
-                    <Signal>LED_flag</Signal>
+                    <Signal>LED</Signal>
                 </SignalList>
             </Trigger>
-            <Trigger index="1">
-                <SignalList>
-                    <Signal>LED_flag</Signal>
-                </SignalList>
-            </Trigger>
-            <Trigger index="2">
-                <SignalList>
-                    <Signal>debug_PLL_594MHZ</Signal>
-                </SignalList>
-            </Trigger>
-            <Trigger index="3">
-                <SignalList>
-                    <Signal>debug_PLL_594MHZ</Signal>
-                </SignalList>
-            </Trigger>
+            <Trigger index="1"/>
+            <Trigger index="2"/>
+            <Trigger index="3"/>
             <Trigger index="4"/>
             <Trigger index="5"/>
             <Trigger index="6"/>
@@ -41,10 +69,10 @@
             <Trigger index="15"/>
         </Triggers>
         <MatchUnits>
-            <MatchUnit index="0" enabled="0" match_type="1" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="F" value1="0" trigger="0"/>
-            <MatchUnit index="1" enabled="0" match_type="1" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="R" value1="0" trigger="1"/>
-            <MatchUnit index="2" enabled="1" match_type="1" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="R" value1="0" trigger="2"/>
-            <MatchUnit index="3" enabled="1" match_type="1" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="F" value1="0" trigger="3"/>
+            <MatchUnit index="0" enabled="1" match_type="1" counter_enable="0" counter_width="2" counter="2" countinuous="1" func="0" value0="R" value1="0" trigger="0"/>
+            <MatchUnit index="1" enabled="1" match_type="1" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="F" value1="0" trigger="0"/>
+            <MatchUnit index="2" enabled="0" match_type="0" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="" value1=""/>
+            <MatchUnit index="3" enabled="0" match_type="0" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="" value1=""/>
             <MatchUnit index="4" enabled="0" match_type="0" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="" value1=""/>
             <MatchUnit index="5" enabled="0" match_type="0" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="" value1=""/>
             <MatchUnit index="6" enabled="0" match_type="0" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="" value1=""/>
@@ -59,8 +87,8 @@
             <MatchUnit index="15" enabled="0" match_type="0" counter_enable="0" counter_width="2" counter="2" countinuous="0" func="0" value0="" value1=""/>
         </MatchUnits>
         <Expressions type="Static">
-            <Expression>M2|M3</Expression>
+            <Expression>M0|M1</Expression>
         </Expressions>
     </AoCore>
-    <GAO_ID>1010110111011011</GAO_ID>
+    <GAO_ID>0101011011011101</GAO_ID>
 </GAO_CONFIG>

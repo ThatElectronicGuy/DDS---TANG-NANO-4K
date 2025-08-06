@@ -51,8 +51,8 @@ architecture Behavioral of top is
     --
 
     -- Signals responsible for bit shift registers
-    signal Q4BS : STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
-    signal Q32BS : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
+    signal Q4BS : STD_LOGIC_VECTOR (3 downto 0) := b"1011";
+    signal Q32BS : STD_LOGIC_VECTOR (31 downto 0) := x"05F5E100";
     signal Reset_All : STD_LOGIC := '0';
     --
 
@@ -63,7 +63,8 @@ architecture Behavioral of top is
 
     -- Signals needed for 32 bit Comparator counter for square wave generation
     signal clock_300MHZ : STD_LOGIC;
-    signal Output_Comparator_Counter : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
+    signal Output_Comparator_Counter : STD_LOGIC_VECTOR (31 downto 0);
+    signal reset_comparator : STD_LOGIC := '0';
     --
 
     -- Signal that is needed for demultiplexer that routes 32 BSR output
@@ -75,19 +76,31 @@ architecture Behavioral of top is
     --
     
     -- Signals used in all ROMS
-    attribute keep : boolean;
+    attribute keep : integer;
+
+
     signal Triangle_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Triangle_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
-    attribute keep of Triangle_Wave_DAC_Drive : signal is true;
+    attribute keep of Triangle_Wave_DAC_Drive : signal is 1;
+    attribute keep of Triangle_Wave_Address : signal is 1;
+
+
     signal Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
-    attribute keep of Sawtooth_Wave_DAC_Drive : signal is true;
+    attribute keep of Sawtooth_Wave_DAC_Drive : signal is 1;
+    attribute keep of Sawtooth_Wave_Address : signal is 1;
+
+
     signal Reverse_Sawtooth_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Reverse_Sawtooth_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
-    attribute keep of Reverse_Sawtooth_Wave_DAC_Drive : signal is true;
+    attribute keep of Reverse_Sawtooth_Wave_DAC_Drive : signal is 1;
+    attribute keep of Reverse_Sawtooth_Wave_Address : signal is 1;
+
+
     signal Sine_Wave_Address : STD_LOGIC_VECTOR (5 downto 0);
     signal Sine_Wave_DAC_Drive : STD_LOGIC_VECTOR (15 downto 0);
-    attribute keep of Sine_Wave_DAC_Drive : signal is true;
+    attribute keep of Sine_Wave_DAC_Drive : signal is 1;
+    attribute keep of Sine_Wave_Address : signal is 1;
 
     signal Address6 : STD_LOGIC_VECTOR (5 downto 0) := (others => '0');
     --
@@ -158,7 +171,7 @@ begin
         RESET => '0',
         D => x"00000001",
         Q => Output_Comparator_Counter,
-        ARESET => Reset_All
+        ARESET => reset_comparator
     );
 
     -- performing logic for enabling of rom counter and direction of 32BS Register output
@@ -169,17 +182,24 @@ begin
     --
 
     -- Comparator Logic
-    process (clock_300MHZ)
+    process (CLK_27MHZ)
     begin
-    if rising_edge (clock_300MHZ) then
+    if rising_edge (CLK_27MHZ) then
     if Output_Comparator_Counter = Comparator_Storage then
         Square_Wave_S <= not Square_Wave_S;
+        reset_comparator <= '1';
+    else
+        reset_comparator <= '0';
     end if;
     end if;
     end process;
 
     Square_Wave_IO_Toggle_PIN <= Square_Wave_S;
+    LED <= Square_Wave_S;
     --
+
+
+
 
     -- Instantiating Triangle Wave ROM
     Triangle_Wave : entity work.Triangle_Wave_ROM
@@ -269,37 +289,7 @@ begin
         clkin => CLK_27MHZ,
         clkout => clock_594MHZ
     );
-
-
     --giving internal pll clock on output pin
     CLK_594MHZ <= clock_594MHZ;
-
-
-    --
-    process(CLK_27MHZ)      --      process of clock divider
-    begin
-        if rising_edge(CLK_27MHZ) then
-        clk_div <= clk_div + 1;
-        if clk_div = 135000 then
-        slow_clk <= not slow_clk;
-        clk_div <= (others => '0');
-        end if;
-        end if;
-    end process;
-
-
-    --
-    --instantiating 8 bit counter
-    LED_counter : entity work.counter_8bit
-    port map (
-        CLK => slow_clk,
-        ENABLE => enableV,
-        RESET => resetV,
-        ARESET => aresetV,
-        D => "00000001",
-        Q => Q
-    );
-     
-
 
 end Behavioral;

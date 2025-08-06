@@ -1,7 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-
 entity Triangle_Wave_ROM is
 Port
 (
@@ -10,9 +9,11 @@ Port
 );
 end Triangle_Wave_ROM;
 
+
+
 architecture Behavioral of Triangle_Wave_ROM is
     type Triangle_Wave_Table is array (0 to 63) of STD_LOGIC_VECTOR (15 downto 0);
-    
+
     constant ROM : Triangle_Wave_Table :=
     (
                 0 => x"0000",
@@ -80,6 +81,8 @@ architecture Behavioral of Triangle_Wave_ROM is
                 62 => x"0008",
                 63 => x"0000"
 );
+    attribute syn_romstyle:string;
+    attribute syn_romstyle of ROM : constant is "block_rom";
 
 begin
     DATA <= ROM(to_integer(unsigned(ADDR)));
