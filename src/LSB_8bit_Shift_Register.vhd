@@ -14,15 +14,15 @@ entity LSB_bit_shift_register_4bit is --LSB on D side which means that it's shif
 end LSB_bit_shift_register_4bit;
 
 architecture Behavioral of LSB_bit_shift_register_4bit is   
-    signal Q_s : STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
+    signal Q_s : STD_LOGIC_VECTOR (3 downto 0) := "1011";
 begin
-    process (all)
+    process (CLK)
     begin
         if RESET = '1' then
-        Q_s <= (others => '0');
-        elsif ENABLE = '1' then
-        if rising_edge(CLK) then
-        Q_s <= Q_s (2 downto 0) & D;
+        Q_s <= "1011";
+        elsif rising_edge(CLK) then
+        if ENABLE = '1' then
+        Q_s <= Q_s(2 downto 0) & D;
         end if;
         end if;
     end process;

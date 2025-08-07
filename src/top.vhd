@@ -21,7 +21,8 @@ entity top is
             MOSI : in STD_LOGIC;
             MSCLK : in STD_LOGIC; -- MSCLK from uC side
             Square_Wave_IO_Toggle_PIN : out STD_LOGIC;
-            DAC_Output : out STD_LOGIC_VECTOR (15 downto 0)
+            DAC_Output : out STD_LOGIC_VECTOR (15 downto 0);
+            DEBUG : out STD_LOGIC
          );
 end top;
 
@@ -51,8 +52,8 @@ architecture Behavioral of top is
     --
 
     -- Signals responsible for bit shift registers
-    signal Q4BS : STD_LOGIC_VECTOR (3 downto 0) := b"1011";
-    signal Q32BS : STD_LOGIC_VECTOR (31 downto 0) := x"05F5E100";
+    signal Q4BS : STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
+    signal Q32BS : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
     signal Reset_All : STD_LOGIC := '0';
     --
 
@@ -113,14 +114,17 @@ architecture Behavioral of top is
     signal clock_100MHZ : STD_LOGIC;
     --
 
+    -- debug signals
+    signal CS4_s : STD_LOGIC := '1';
+    signal CS32_s : STD_LOGIC := '1';
 
     -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 begin
 
     -- Demultiplexer for SPI input
-    Output32SPIIN <= MOSI when (CS32 = '0' and CS4 = '1') else '0';
-    Output4SPIIN <= MOSI when (CS4 = '0' and CS32 = '1') else '0';
+    Output32SPIIN <= MOSI when (CS32_s = '0' and CS4_s = '1') else '0';
+    Output4SPIIN <= MOSI when (CS4_s = '0' and CS32_s = '1') else '0';
     --
 
     -- instantiating 4 bit shift register
@@ -131,7 +135,7 @@ begin
         Q => Q4BS,
         CLK => MSCLK,
         RESET => Reset_All,
-        ENABLE => not CS4
+        ENABLE => (not CS4_s)
     );
     --
 
@@ -143,7 +147,7 @@ begin
         Q => Q32BS,
         CLK => MSCLK,
         RESET => Reset_All,
-        ENABLE => not CS32
+        ENABLE => (not CS32_s)
     );
     --
 
@@ -265,7 +269,8 @@ begin
     --
 
     -- Assigning Reset_All function for "111"
-    Reset_All <= '1' when (Q4BS(3) = '1' and Q4BS(2) = '1' and Q4BS(1) = '1') else '0';
+    --Reset_All <= '1' when (Q4BS(3) = '1' and Q4BS(2) = '1' and Q4BS(1) = '1') else '0';
+    Reset_All <= '1';
     --
 
     --
@@ -274,6 +279,10 @@ begin
 
     -- Tying roms output to something uselless so that synthesis tool does not sweep them out in optimizing
     DEBUG_s <= Triangle_Wave_DAC_Drive or Sawtooth_Wave_DAC_Drive or Reverse_Sawtooth_Wave_DAC_Drive or Sine_Wave_DAC_Drive;
+    --
+
+    -- Debugging
+    DEBUG <= Q4BS(0);
     --
 
 
