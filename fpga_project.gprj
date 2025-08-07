@@ -14,6 +14,10 @@
         <File path="src/ROM - Sine Wave.vhd" type="file.vhdl" enable="1"/>
         <File path="src/ROM - Triangle Wave.vhd" type="file.vhdl" enable="1"/>
         <File path="src/gowin_pllvr/gowin_pllvr.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/gowin_prom/ROM_Reverse_Sawtooth_Wave.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/gowin_prom/ROM_Sawtooth_Wave.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/gowin_prom/ROM_Sine_Wave.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/gowin_prom/ROM_Triangle_Wave.vhd" type="file.vhdl" enable="1"/>
         <File path="src/top.vhd" type="file.vhdl" enable="1"/>
         <File path="src/Pin_Links.cst" type="file.cst" enable="1"/>
         <File path="src/Clocks.sdc" type="file.sdc" enable="1"/>
