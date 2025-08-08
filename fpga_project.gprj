@@ -9,10 +9,6 @@
         <File path="src/8 bit counter.vhd" type="file.vhdl" enable="1"/>
         <File path="src/LSB_32bit_Shift_Register.vhd" type="file.vhdl" enable="1"/>
         <File path="src/LSB_8bit_Shift_Register.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/ROM - Reverse Sawtooth Wave.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/ROM - Sawtooth Wave.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/ROM - Sine Wave.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/ROM - Triangle Wave.vhd" type="file.vhdl" enable="1"/>
         <File path="src/gowin_pllvr/gowin_pllvr.vhd" type="file.vhdl" enable="1"/>
         <File path="src/gowin_prom/ROM_Reverse_Sawtooth_Wave.vhd" type="file.vhdl" enable="1"/>
         <File path="src/gowin_prom/ROM_Sawtooth_Wave.vhd" type="file.vhdl" enable="1"/>

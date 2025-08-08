@@ -4,7 +4,7 @@
 --Tool Version: V1.9.11.02 (64-bit)
 --Part Number: GW1NSR-LV4CQN48PC7/I6
 --Device: GW1NSR-4C
---Created Time: Fri Jul 25 20:11:11 2025
+--Created Time: Fri Aug  8 14:18:47 2025
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -12,16 +12,16 @@ use IEEE.std_logic_1164.all;
 entity Gowin_PLLVR is
     port (
         clkout: out std_logic;
+        lock: out std_logic;
+        clkoutd3: out std_logic;
         clkin: in std_logic
     );
 end Gowin_PLLVR;
 
 architecture Behavioral of Gowin_PLLVR is
 
-    signal lock_o: std_logic;
     signal clkoutp_o: std_logic;
     signal clkoutd_o: std_logic;
-    signal clkoutd3_o: std_logic;
     signal gw_vcc: std_logic;
     signal gw_gnd: std_logic;
     signal FBDSEL_i: std_logic_vector(5 downto 0);
@@ -93,13 +93,13 @@ begin
             FCLKIN => "27",
             DEVICE => "GW1NSR-4C",
             DYN_IDIV_SEL => "false",
-            IDIV_SEL => 0,
+            IDIV_SEL => 4,
             DYN_FBDIV_SEL => "false",
-            FBDIV_SEL => 21,
+            FBDIV_SEL => 55,
             DYN_ODIV_SEL => "false",
             ODIV_SEL => 2,
             PSDA_SEL => "0000",
-            DYN_DA_EN => "true",
+            DYN_DA_EN => "false",
             DUTYDA_SEL => "1000",
             CLKOUT_FT_DIR => '1',
             CLKOUTP_FT_DIR => '1',
@@ -115,10 +115,10 @@ begin
         )
         port map (
             CLKOUT => clkout,
-            LOCK => lock_o,
+            LOCK => lock,
             CLKOUTP => clkoutp_o,
             CLKOUTD => clkoutd_o,
-            CLKOUTD3 => clkoutd3_o,
+            CLKOUTD3 => clkoutd3,
             RESET => gw_gnd,
             RESET_P => gw_gnd,
             CLKIN => clkin,

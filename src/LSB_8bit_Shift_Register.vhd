@@ -16,7 +16,7 @@ end LSB_bit_shift_register_4bit;
 architecture Behavioral of LSB_bit_shift_register_4bit is   
     signal Q_s : STD_LOGIC_VECTOR (3 downto 0) := "1011";
 begin
-    process (CLK)
+    process (CLK,RESET)
     begin
         if RESET = '1' then
         Q_s <= "1011";
