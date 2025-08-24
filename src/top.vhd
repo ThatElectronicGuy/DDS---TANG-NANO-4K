@@ -167,10 +167,10 @@ begin
     (
         CLK => CLK_27MHZ,
         ENABLE => Q4BS(0),
-        RESET => '0',
+        RESET => reset_comparator,
         D => x"00000001",
         Q => Output_Comparator_Counter,
-        ARESET => reset_comparator
+        ARESET => '0'
     );
 
     -- performing logic for enabling of rom counter and direction of 32BS Register output

@@ -19,7 +19,7 @@ begin
     process (CLK,RESET)
     begin
         if RESET = '1' then
-        Q_s <= x"05F5E100";
+        Q_s <= x"000000BB";
         elsif rising_edge(CLK) then
         if ENABLE = '1' then
         Q_s <= Q_s (30 downto 0) & D;

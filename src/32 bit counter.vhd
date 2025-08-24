@@ -29,5 +29,5 @@ begin
         end if;
     end process;
 
-    Q <= STD_LOGIC_VECTOR (count);
+    Q <= STD_LOGIC_VECTOR(count);
 end Behavioral;
