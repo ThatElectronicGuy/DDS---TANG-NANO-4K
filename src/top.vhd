@@ -153,11 +153,11 @@ begin
     port map
     (
         CLK => clock_100MHZ,
-        ENABLE => Enable_stepcounter,
+        ENABLE => '1',
         RESET => '0',
         D => Incrementing_Step,
         Q => Output32_Rom_Counter,
-        ARESET => Reset_All
+        ARESET => '0'
     );
     --
 
@@ -206,9 +206,9 @@ begin
     (
         dout => Triangle_Wave_DAC_Drive,
         clk => clock_100MHZ,
-        oce => Q4BS(0),                 -- enable
-        ce => Q4BS(0),                  -- chip enable?
-        reset => Reset_All,
+        oce => not Q4BS(0),                 -- enable
+        ce => not Q4BS(0),                  -- chip enable?
+        reset => '0',
         ad => Triangle_Wave_Address
     );
     --
@@ -219,9 +219,9 @@ begin
     (
         dout => Sawtooth_Wave_DAC_Drive,
         clk => clock_100MHZ,
-        oce => Q4BS(0),
-        ce => Q4BS(0),
-        reset => Reset_All,
+        oce => not Q4BS(0),
+        ce => not Q4BS(0),
+        reset => '0',
         ad => Sawtooth_Wave_Address
     );
     --
@@ -232,9 +232,9 @@ begin
     (
         dout => Reverse_Sawtooth_Wave_DAC_Drive,
         clk => clock_100MHZ,
-        oce => Q4BS(0),
-        ce => Q4BS(0),
-        reset => Reset_All,
+        oce => not Q4BS(0),
+        ce => not Q4BS(0),
+        reset => '0',
         ad => Reverse_Sawtooth_Wave_Address
     );
     --
@@ -245,9 +245,9 @@ begin
     (
         dout => Sine_Wave_DAC_Drive,
         clk => clock_100MHZ,
-        oce => Q4BS(0),
-        ce => Q4BS(0),
-        reset => Reset_All,
+        oce => not Q4BS(0),
+        ce => not Q4BS(0),
+        reset => '0',
         ad => Sine_Wave_Address
     );
 
@@ -290,7 +290,7 @@ begin
 
 
     -- Debugging
-    DEBUG <= Q4BS(0);
+    DEBUG <= PLL_Status;
     --
 
 

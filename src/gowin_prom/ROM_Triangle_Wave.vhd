@@ -111,7 +111,7 @@ architecture Behavioral of ROM_Triangle_Wave is
 begin
     gw_gnd <= '0';
 
-    prom_inst_0_AD_i <= gw_gnd & gw_gnd & gw_gnd & gw_gnd & ad(5 downto 0) & gw_gnd & gw_gnd & gw_gnd & gw_gnd;
+    prom_inst_0_AD_i <= (13 downto 10 => '0') & ad(5 downto 0) & (3 downto 0 => '0');
     dout(15 downto 0) <= prom_inst_0_DO_o(15 downto 0) ;
     prom_inst_0_dout_w(15 downto 0) <= prom_inst_0_DO_o(31 downto 16) ;
 
